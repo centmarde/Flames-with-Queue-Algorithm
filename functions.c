@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
 // Function to convert a string to lowercase
 void toLowercase(char str[]) {
     for (int i = 0; str[i]; i++) {
@@ -141,7 +144,7 @@ int countLeftover(char name1[], char name2[]) {
 
 // Function to get the FLAMES result using a linear search
 char* getFlamesResult(int count) {
-    char* flames[] = {"Friends", "Lovers", "Affectionate", "Marriage", "Enemies", "Soulmates"};
+    char* flames[] = {"Friends", "Lovers", "Anger", "Marriage", "Engagement", "Soulmates"};
     int index = (count - 1) % 6;
     return flames[index];
 }
