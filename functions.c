@@ -1,19 +1,4 @@
 #include <stdio.h>
-// Queue node structure
-typedef struct Node {
-    char data;
-    struct Node* next;
-} Node;
-
-// Queue structure
-typedef struct {
-    Node* front;
-    Node* rear;
-    int size;
-} Queue;
-
-// Initialize the queue
-
 // Function to convert a string to lowercase
 void toLowercase(char str[]) {
     for (int i = 0; str[i]; i++) {
@@ -32,6 +17,20 @@ void removeSpaces(char str[]) {
     str[count] = '\0';
 }
 
+// Queue node structure
+typedef struct Node {
+    char data;
+    struct Node* next;
+} Node;
+
+// Queue structure
+typedef struct {
+    Node* front;
+    Node* rear;
+    int size;
+} Queue;
+
+// Initialize the queue
 void initQueue(Queue* q) {
     q->front = NULL;
     q->rear = NULL;
@@ -69,6 +68,32 @@ char dequeue(Queue* q) {
     return element;
 }
 
+// Function to remove a specific character from a queue
+void removeCharFromQueue(Queue* q, char ch) {
+    Node* current = q->front;
+    Node* prev = NULL;
+
+    while (current != NULL) {
+        if (current->data == ch) {
+            Node* temp = current;
+            if (prev == NULL) {
+                q->front = current->next;
+            } else {
+                prev->next = current->next;
+            }
+            if (current->next == NULL) {
+                q->rear = prev;
+            }
+            current = current->next;
+            free(temp);
+            q->size--;
+        } else {
+            prev = current;
+            current = current->next;
+        }
+    }
+}
+
 // Function to count the number of common characters and leftover characters
 int countLeftover(char name1[], char name2[]) {
     Queue q1, q2;
@@ -83,48 +108,35 @@ int countLeftover(char name1[], char name2[]) {
         enqueue(&q2, name2[i]);
     }
 
-    // Array to mark the used characters in name2
-    int used[100] = {0};
-    int count = 0;
+    // Array to track characters that need to be removed
+    char toRemove1[100] = {0};
+    char toRemove2[100] = {0};
 
-    // Process the first queue
     Node* current1 = q1.front;
     while (current1 != NULL) {
         char ch1 = current1->data;
-        int found = 0;
-
-        // Look for a matching character in name2
         Node* current2 = q2.front;
-        int pos = 0;
         while (current2 != NULL) {
-            if (ch1 == current2->data && !used[pos]) {
-                used[pos] = 1; // Mark the character as used
-                found = 1;
+            if (ch1 == current2->data) {
+                toRemove1[strlen(toRemove1)] = ch1;
+                toRemove2[strlen(toRemove2)] = ch1;
                 break;
             }
             current2 = current2->next;
-            pos++;
         }
-
-        if (!found) {
-            count++;
-        }
-
         current1 = current1->next;
     }
 
-    // Count the remaining characters in name2 that were not used
-    Node* current = q2.front;
-    int pos = 0;
-    while (current != NULL) {
-        if (!used[pos]) {
-            count++;
-        }
-        current = current->next;
-        pos++;
+    // Remove common characters from both queues
+    for (int i = 0; toRemove1[i]; i++) {
+        removeCharFromQueue(&q1, toRemove1[i]);
+        removeCharFromQueue(&q2, toRemove1[i]);
     }
 
-    return count;
+    // Count remaining elements in both queues
+    int leftoverCount = q1.size + q2.size;
+
+    return leftoverCount;
 }
 
 // Function to get the FLAMES result using a linear search
